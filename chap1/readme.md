@@ -4,6 +4,7 @@ nasm hello.asm -o hello.bin
 - 虚拟机：
 sudo apt install bochs 
 sudo apt-get install bochs-sdl 
+sudo apt-get install bochs-x 
 - 生成配置虚拟机：
 bochs -q
 - 配置虚拟机：
@@ -12,3 +13,5 @@ bochs -q
 - bximage 生成配置硬盘
     + 生成的配置如下：  ata0-master: type=disk, path="master.img", mode=flat   
     + boot: disk   
+- 将代码写入硬盘镜像：
+dd if=hello.bin of=master.img bs=512 count=1 conv=notrunc
