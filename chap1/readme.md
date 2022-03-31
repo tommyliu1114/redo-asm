@@ -18,5 +18,5 @@ dd if=hello.bin of=master.img bs=512 count=1 conv=notrunc
 
 - 安装qemu： sudo apt-get install qemu  && sudo apt install qemu-utils
 
-- 执行qemu转换命令： qemu-img convert -O vmdk master.img master.vmdk 
-- 
+- 执行qemu转换命令： qemu-img convert -O vmdk master.img master.vmdk ,这个格式用于vmware虚拟机
+- 执行qemu转换命令： qemu-img convert -O vdi master.img master.vdi ,这个命令用于生成virtualbox虚拟机的磁盘镜像
