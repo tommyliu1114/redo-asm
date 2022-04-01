@@ -15,3 +15,5 @@ dd  0x12345678; define four byte
 db "hello world!!!" ,12,13; define string 
 
 ```
+# 魔术断点bochs配置
+magic_break: enabled=1

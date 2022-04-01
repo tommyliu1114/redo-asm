@@ -2,7 +2,7 @@
 
 mov ax,3
 int 0x10; 设置文本显示模式
-;xchg bx,bx
+xchg bx,bx
 
 mov ax,0xb800
 mov es,ax
