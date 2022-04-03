@@ -40,7 +40,144 @@ video:
 
 ```
 
+# 远程调用的间接寻址方式
+```asm
+mov ax,0
+mov ds,ax 
+mov ss,ax
+mov sp,0x7c00
+
+
+call far [function]
+
+halt:
+    jmp halt
+
+print:
+    ; 负责保护现场，保存下当前的寄存器到堆栈
+    push ax
+    push bx 
+    push es 
+    ; 保存现场完毕
+    mov ax, 0xb800
+    mov es,ax 
+
+    mov bx, [video]
+    mov byte [es:bx],'K'
+    add word [video],2 
+    ;从堆栈中恢复现场
+    pop es
+    pop bx
+    pop ax 
+    ;
+    retf ;pop ip; pop cs 
+
+
+
+video:
+    dw 0x0
+
+
+function:
+    dw print, 0 
+
+```
+
 # 内中断 
++ 1个中断向量4个字节
++ 0 - 255 个中断；
++ 0 号向量除法异常
++ 0x80号向量 ：linux的系统调用（软中断），地址在0X80*4 ～ 0X80*4 +3 之间 ；前两个字节为偏移字节，后两个字节为
++ 0x80号向量内中断（软中断示例）
+```asm
+mov ax,0
+mov ds,ax 
+mov ss,ax
+mov sp,0x7c00
+; 开始注册中断
+mov word [0x80*4],print 
+mov word [0x80*4 + 2],0  
+; 注册中断结束
+
+int 0x80; 触发中断 ;做了3件事情   push flag; ; push cs ; push ip;
+
+halt:
+    jmp halt
+
+print:
+    ; 负责保护现场，保存下当前的寄存器到堆栈
+    push ax
+    push bx 
+    push es 
+    ; 保存现场完毕
+    mov ax, 0xb800
+    mov es,ax 
+
+    mov bx, [video]
+    mov byte [es:bx],'K'
+    add word [video],2 
+    ;从堆栈中恢复现场
+    pop es
+    pop bx
+    pop ax 
+    ;
+    iret;  pop ip; pop cs ; pop flag;
+
+
+
+video:
+    dw 0x0
+```
++ 除法异常0号中断演示：注意不同点，除法异常保存cs：ip的时候仍然为除法指令的地址，所以会循环触发异常
+```asm
+mov ax,0
+mov ds,ax 
+mov ss,ax
+mov sp,0x7c00
+; 开始注册中断
+mov word [0*4],div_err 
+mov word [0*4 + 2],0  
+; 注册中断结束
+
+mov dx,0
+mov ax,1
+mov bx,0 
+div bx  
+; dx:ax / bx 
+; 除法分子为0 ， 触发中断 ;做了3件事情   push flag; ; push cs ; push ip;
+
+halt:
+    jmp halt
+
+div_err:
+    ; 负责保护现场，保存下当前的寄存器到堆栈
+    push ax
+    push bx 
+    push es 
+    ; 保存现场完毕
+    mov ax, 0xb800
+    mov es,ax 
+
+    mov bx, [video]
+    mov byte [es:bx],'/'
+    add word [video],2 
+    ;从堆栈中恢复现场
+    pop es
+    pop bx
+    pop ax 
+    ;
+    iret;  pop ip; pop cs ; pop flag;
+
+
+
+video:
+    dw 0x0
+
+
+```
+
+
+
 # 内存布局
 | 起始地址 | 结束地址 | 大小 | 用途 |
 | ------  | ------- | ------ | ---- |
