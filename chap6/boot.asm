@@ -11,7 +11,7 @@ mov sp,0x7c00
 
 mov cx,20
 loop1:
-    call print 
+    call print ; 相当于两条指令：push ip ； jmp print 
     loop loop1
 
 halt:
@@ -24,7 +24,7 @@ print:
     mov bx, [video]
     mov byte [es:bx],'.'
     add word [video],2 
-    ret 
+    ret ； 相当于指令pop ip; 将栈顶弹出到ip寄存器
 
 
 
